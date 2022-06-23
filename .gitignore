@@ -1,0 +1,12 @@
+.vscode/
+raw_data/
+saved_model*/
+splitted_data*/
+.ipynb*/
+__pycache__
+*report/
+*achieved_models/
+*output/
+data.mat
+s0.png
+simulation/
