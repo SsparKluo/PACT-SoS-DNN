@@ -1,3 +1,4 @@
+from tracemalloc import _TraceTupleT
 from tensorflow.keras.models import Model
 from tensorflow.keras import Input
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Conv2DTranspose, Concatenate
@@ -76,12 +77,13 @@ def unet_with_denses(img_shape=(512, 384, 1),
              n]) if res else n
 
     def dense_link(m, acti, do):
+        shape = int_shape(m)[1:]
         n = Flatten()(m)
-        n = Dense()(n)
+        n = Dense(unit=shape[0] * shape[1], kernel_initializer=initializers.HeNormal())(n)
         n = LeakyReLU()(m) if acti == 'relu' else activations.sigmoid(m)
         n = Dropout(do)(n) if do else n
-        n = Dense()(n)
-        return Reshape(int_shape(m)[1:])(n)
+        n = Dense(unit=shape[0] * shape[1], kernel_initializer=initializers.HeNormal())(n)
+        return Reshape(target_shape=(shape[0], shape[1], 1))(n)
 
 
     def level_block(m, dim, depth, inc, acti, do, bn, mp, up, res, pd):
