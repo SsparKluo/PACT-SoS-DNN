@@ -17,7 +17,7 @@ import network
 
 print("Training for a new UNet model:")
 
-model = network.UNet()
+model = network.unet_with_denses()
 plot_model(model)
 model.compile(loss=BinaryCrossentropy(from_logits=False), optimizer=optim.Adam())
 
