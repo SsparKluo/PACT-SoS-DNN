@@ -1,0 +1,147 @@
+Training for a new UNet model:
+2022-06-21 14:13:16.531932: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcuda.so.1
+2022-06-21 14:13:16.604199: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1733] Found device 0 with properties: 
+pciBusID: 0000:57:00.0 name: NVIDIA GeForce RTX 3090 computeCapability: 8.6
+coreClock: 1.695GHz coreCount: 82 deviceMemorySize: 23.70GiB deviceMemoryBandwidth: 871.81GiB/s
+2022-06-21 14:13:16.604282: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcudart.so.11.0
+2022-06-21 14:13:16.609631: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcublas.so.11
+2022-06-21 14:13:16.609726: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcublasLt.so.11
+2022-06-21 14:13:16.611326: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcufft.so.10
+2022-06-21 14:13:16.611739: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcurand.so.10
+2022-06-21 14:13:16.613053: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcusolver.so.11
+2022-06-21 14:13:16.614161: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcusparse.so.11
+2022-06-21 14:13:16.614392: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcudnn.so.8
+2022-06-21 14:13:16.616358: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1871] Adding visible gpu devices: 0
+2022-06-21 14:13:16.616787: I tensorflow/core/platform/cpu_feature_guard.cc:142] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 AVX512F FMA
+To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2022-06-21 14:13:16.638511: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1733] Found device 0 with properties: 
+pciBusID: 0000:57:00.0 name: NVIDIA GeForce RTX 3090 computeCapability: 8.6
+coreClock: 1.695GHz coreCount: 82 deviceMemorySize: 23.70GiB deviceMemoryBandwidth: 871.81GiB/s
+2022-06-21 14:13:16.640903: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1871] Adding visible gpu devices: 0
+2022-06-21 14:13:16.641001: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcudart.so.11.0
+2022-06-21 14:13:17.463485: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1258] Device interconnect StreamExecutor with strength 1 edge matrix:
+2022-06-21 14:13:17.463537: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1264]      0 
+2022-06-21 14:13:17.463546: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1277] 0:   N 
+2022-06-21 14:13:17.466553: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1418] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 22318 MB memory) -> physical GPU (device: 0, name: NVIDIA GeForce RTX 3090, pci bus id: 0000:57:00.0, compute capability: 8.6)
+2022-06-21 14:13:18.499654: I tensorflow/compiler/mlir/mlir_graph_optimization_pass.cc:176] None of the MLIR Optimization Passes are enabled (registered 2)
+2022-06-21 14:13:18.508121: I tensorflow/core/platform/profile_utils/cpu_utils.cc:114] CPU Frequency: 2000000000 Hz
+Epoch 1/100
+2022-06-21 14:13:21.454521: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcudnn.so.8
+2022-06-21 14:13:23.433388: I tensorflow/stream_executor/cuda/cuda_dnn.cc:359] Loaded cuDNN version 8101
+2022-06-21 14:13:26.085092: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcublas.so.11
+2022-06-21 14:13:27.337788: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcublasLt.so.11
+167/167 [==============================] - 123s 648ms/step - loss: 11329.0713 - val_loss: 657.1174
+Epoch 2/100
+167/167 [==============================] - 104s 618ms/step - loss: 16.4747 - val_loss: 263.9587
+Epoch 3/100
+167/167 [==============================] - 104s 618ms/step - loss: 9.8577 - val_loss: 95.5702
+Epoch 4/100
+167/167 [==============================] - 104s 614ms/step - loss: 6.9487 - val_loss: 37.3051
+Epoch 5/100
+167/167 [==============================] - 104s 615ms/step - loss: 5.3551 - val_loss: 22.3533
+Epoch 6/100
+167/167 [==============================] - 104s 615ms/step - loss: 4.4107 - val_loss: 21.0374
+Epoch 7/100
+167/167 [==============================] - 104s 613ms/step - loss: 3.8550 - val_loss: 22.8421
+Epoch 8/100
+167/167 [==============================] - 104s 614ms/step - loss: 3.2387 - val_loss: 19.4664
+Epoch 9/100
+167/167 [==============================] - 103s 613ms/step - loss: 2.9233 - val_loss: 19.2793
+Epoch 10/100
+167/167 [==============================] - 103s 611ms/step - loss: 2.6336 - val_loss: 15.0482
+Epoch 11/100
+167/167 [==============================] - 103s 611ms/step - loss: 2.4729 - val_loss: 12.6356
+Epoch 12/100
+167/167 [==============================] - 104s 614ms/step - loss: 2.1559 - val_loss: 12.1566
+Epoch 13/100
+167/167 [==============================] - 104s 615ms/step - loss: 2.1364 - val_loss: 12.5366
+Epoch 14/100
+167/167 [==============================] - 103s 612ms/step - loss: 1.8922 - val_loss: 11.3648
+Epoch 15/100
+167/167 [==============================] - 104s 615ms/step - loss: 1.7990 - val_loss: 10.9254
+Epoch 16/100
+167/167 [==============================] - 104s 614ms/step - loss: 1.6455 - val_loss: 10.7491
+Epoch 17/100
+167/167 [==============================] - 103s 614ms/step - loss: 1.5522 - val_loss: 10.4629
+Epoch 18/100
+167/167 [==============================] - 103s 612ms/step - loss: 1.5324 - val_loss: 10.2860
+Epoch 19/100
+167/167 [==============================] - 104s 614ms/step - loss: 1.5901 - val_loss: 13.2430
+Epoch 20/100
+167/167 [==============================] - 103s 612ms/step - loss: 1.3849 - val_loss: 9.3698
+Epoch 21/100
+167/167 [==============================] - 104s 614ms/step - loss: 1.3689 - val_loss: 11.0261
+Epoch 22/100
+167/167 [==============================] - 104s 616ms/step - loss: 1.2788 - val_loss: 9.7435
+Epoch 23/100
+167/167 [==============================] - 104s 613ms/step - loss: 1.1837 - val_loss: 8.9638
+Epoch 24/100
+167/167 [==============================] - 104s 616ms/step - loss: 1.2007 - val_loss: 9.7248
+Epoch 25/100
+167/167 [==============================] - 104s 613ms/step - loss: 1.2760 - val_loss: 10.5984
+Epoch 26/100
+167/167 [==============================] - 104s 616ms/step - loss: 1.2306 - val_loss: 8.4256
+Epoch 27/100
+167/167 [==============================] - 103s 612ms/step - loss: 1.0360 - val_loss: 7.9181
+Epoch 28/100
+167/167 [==============================] - 104s 613ms/step - loss: 1.2183 - val_loss: 8.5239
+Epoch 29/100
+167/167 [==============================] - 104s 614ms/step - loss: 1.0074 - val_loss: 5.0751
+Epoch 30/100
+167/167 [==============================] - 104s 614ms/step - loss: 1.2774 - val_loss: 5.8363
+Epoch 31/100
+167/167 [==============================] - 103s 610ms/step - loss: 0.9806 - val_loss: 6.6071
+Epoch 32/100
+167/167 [==============================] - 103s 613ms/step - loss: 1.0117 - val_loss: 4.9591
+Epoch 33/100
+167/167 [==============================] - 104s 613ms/step - loss: 0.9696 - val_loss: 5.5925
+Epoch 34/100
+167/167 [==============================] - 103s 610ms/step - loss: 0.9865 - val_loss: 4.1056
+Epoch 35/100
+167/167 [==============================] - 103s 612ms/step - loss: 0.9989 - val_loss: 3.2224
+Epoch 36/100
+167/167 [==============================] - 103s 614ms/step - loss: 1.0363 - val_loss: 3.2680
+Epoch 37/100
+167/167 [==============================] - 103s 611ms/step - loss: 0.8635 - val_loss: 5.1771
+Epoch 38/100
+167/167 [==============================] - 104s 614ms/step - loss: 0.9004 - val_loss: 4.2112
+Epoch 39/100
+167/167 [==============================] - 103s 612ms/step - loss: 0.8427 - val_loss: 4.1445
+Epoch 40/100
+167/167 [==============================] - 103s 611ms/step - loss: 0.8229 - val_loss: 3.8810
+Epoch 41/100
+167/167 [==============================] - 104s 614ms/step - loss: 0.8050 - val_loss: 3.6534
+Epoch 42/100
+167/167 [==============================] - 104s 614ms/step - loss: 0.8030 - val_loss: 4.1831
+Epoch 43/100
+167/167 [==============================] - 104s 614ms/step - loss: 0.7559 - val_loss: 4.4817
+Epoch 44/100
+167/167 [==============================] - 104s 614ms/step - loss: 0.7927 - val_loss: 3.1537
+Epoch 45/100
+167/167 [==============================] - 104s 614ms/step - loss: 0.9320 - val_loss: 3.9105
+
+Epoch 00045: ReduceLROnPlateau reducing learning rate to 0.00010000000474974513.
+Epoch 46/100
+167/167 [==============================] - 103s 611ms/step - loss: 0.6598 - val_loss: 3.7469
+Epoch 47/100
+167/167 [==============================] - 103s 612ms/step - loss: 0.6406 - val_loss: 3.7493
+Epoch 48/100
+167/167 [==============================] - 104s 614ms/step - loss: 0.6344 - val_loss: 3.8279
+Epoch 49/100
+167/167 [==============================] - 103s 612ms/step - loss: 0.6365 - val_loss: 3.8052
+Epoch 50/100
+167/167 [==============================] - 104s 616ms/step - loss: 0.6358 - val_loss: 3.7649
+Epoch 51/100
+167/167 [==============================] - 104s 616ms/step - loss: 0.6306 - val_loss: 3.8652
+Epoch 52/100
+167/167 [==============================] - 104s 614ms/step - loss: 0.6299 - val_loss: 3.8674
+Epoch 53/100
+167/167 [==============================] - 103s 609ms/step - loss: 0.6362 - val_loss: 3.7374
+Epoch 54/100
+167/167 [==============================] - 104s 617ms/step - loss: 0.6279 - val_loss: 3.7223
+Epoch 55/100
+167/167 [==============================] - 104s 614ms/step - loss: 0.6320 - val_loss: 3.7677
+
+Epoch 00055: ReduceLROnPlateau reducing learning rate to 1.0000000474974514e-05.
+Epoch 56/100
+167/167 [==============================] - 104s 616ms/step - loss: 0.6151 - val_loss: 3.8076
