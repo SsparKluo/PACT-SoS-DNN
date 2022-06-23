@@ -1,4 +1,3 @@
-from tracemalloc import _TraceTupleT
 from tensorflow.keras.models import Model
 from tensorflow.keras import Input
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Conv2DTranspose, Concatenate
@@ -11,7 +10,7 @@ from keras.backend import int_shape
 
 def unet(
         img_shape=(512, 384, 1),
-        out_ch=1, start_ch=64, depth=4, inc_rate=2., activation='relu', dropout=0.5,
+        out_ch=1, start_ch=64, depth=3, inc_rate=2., activation='relu', dropout=0.5,
         batchnorm=False, maxpool=True, upconv=True, residual=False, padding='same'):
 
     def conv_block(m, dim, acti, bn, res, do, pd='same'):
@@ -79,10 +78,10 @@ def unet_with_denses(img_shape=(512, 384, 1),
     def dense_link(m, acti, do):
         shape = int_shape(m)[1:]
         n = Flatten()(m)
-        n = Dense(unit=shape[0] * shape[1], kernel_initializer=initializers.HeNormal())(n)
+        n = Dense(units=shape[0] * shape[1], kernel_initializer=initializers.HeNormal())(n)
         n = LeakyReLU()(m) if acti == 'relu' else activations.sigmoid(m)
         n = Dropout(do)(n) if do else n
-        n = Dense(unit=shape[0] * shape[1], kernel_initializer=initializers.HeNormal())(n)
+        n = Dense(units=shape[0] * shape[1], kernel_initializer=initializers.HeNormal())(n)
         return Reshape(target_shape=(shape[0], shape[1], 1))(n)
 
 

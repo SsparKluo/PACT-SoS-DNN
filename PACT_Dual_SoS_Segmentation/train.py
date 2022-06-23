@@ -1,5 +1,5 @@
 # Basic configuration
-bs = 12
+bs = 8
 saved_model = './saved_model/unet_with_dense'
 
 # import data
