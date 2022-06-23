@@ -1,6 +1,6 @@
 # Basic configuration
 bs = 12
-saved_model = './saved_model/unet'
+saved_model = './saved_model/unet_with_dense'
 
 # import data
 import data_io
@@ -18,6 +18,7 @@ import network
 print("Training for a new UNet model:")
 
 model = network.UNet()
+plot_model(model)
 model.compile(loss=BinaryCrossentropy(from_logits=False), optimizer=optim.Adam())
 
 reduce_lr = ReduceLROnPlateau(

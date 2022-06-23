@@ -1,12 +1,14 @@
 from tensorflow.keras.models import Model
 from tensorflow.keras import Input
-from tensorflow.keras.layers import Conv2D, concatenate, MaxPooling2D, Conv2DTranspose, Concatenate
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Conv2DTranspose, Concatenate
 from tensorflow.keras.layers import UpSampling2D, Dropout, BatchNormalization, Cropping2D, LeakyReLU
+from tensorflow.keras.layers import Dense, Flatten, Reshape
 from tensorflow.keras import initializers, activations
+from keras.backend import int_shape
 # import layer_object
 
 
-def UNet(
+def unet(
         img_shape=(512, 384, 1),
         out_ch=1, start_ch=64, depth=4, inc_rate=2., activation='relu', dropout=0.5,
         batchnorm=False, maxpool=True, upconv=True, residual=False, padding='same'):
@@ -57,7 +59,7 @@ def UNet(
     return Model(inputs=input, outputs=output)
 
 
-def FCNWithMLP(img_shape=(512, 384, 1),
+def unet_with_denses(img_shape=(512, 384, 1),
         out_ch=1, start_ch=64, depth=4, inc_rate=2., activation='relu', dropout=0.5,
         batchnorm=False, maxpool=True, upconv=True, residual=False, padding='same'):
 
@@ -72,6 +74,15 @@ def FCNWithMLP(img_shape=(512, 384, 1),
         return Concatenate()(
             [Cropping2D(cropping=2 if padding == 'valid' else 0)(m),
              n]) if res else n
+
+    def dense_link(m, acti, do):
+        n = Flatten()(m)
+        n = Dense()(n)
+        n = LeakyReLU()(m) if acti == 'relu' else activations.sigmoid(m)
+        n = Dropout(do)(n) if do else n
+        n = Dense()(n)
+        return Reshape(int_shape(m)[1:])(n)
+
 
     def level_block(m, dim, depth, inc, acti, do, bn, mp, up, res, pd):
         if depth > 0:
@@ -90,6 +101,7 @@ def FCNWithMLP(img_shape=(512, 384, 1),
                                     kernel_initializer=initializers.HeNormal())(m)
                 m = BatchNormalization()(m) if bn else m
                 m = LeakyReLU()(m) if acti == 'relu' else activations.sigmoid(m)
+            n = dense_link(n, acti, do)
             n = Concatenate()(
                 [Cropping2D(cropping=(2 ** (depth - 1) * 12 - 8))(n),
                  m]) if padding == 'valid' else Concatenate()(
