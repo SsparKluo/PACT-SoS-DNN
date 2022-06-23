@@ -81,7 +81,7 @@ def unet_with_denses(img_shape=(512, 384, 1),
         n = Dense(units=shape[1], kernel_initializer=initializers.HeNormal())(n)
         n = LeakyReLU()(m) if acti == 'relu' else activations.sigmoid(m)
         n = Dropout(do)(n) if do else n
-        n = Dense(units=shape[1], kernel_initializer=initializers.HeNormal())(n)
+        n = Dense(units=shape[0] * shape[1], kernel_initializer=initializers.HeNormal())(n)
         return Reshape(target_shape=(shape[0], shape[1], 1))(n)
 
 
