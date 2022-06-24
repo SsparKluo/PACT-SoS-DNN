@@ -10,7 +10,7 @@ from keras.backend import int_shape
 
 def unet(
         img_shape=(512, 384, 1),
-        out_ch=1, start_ch=64, depth=3, inc_rate=2., activation='relu', dropout=0.5,
+        out_ch=1, start_ch=64, depth=4, inc_rate=2., activation='relu', dropout=0.5,
         batchnorm=False, maxpool=True, upconv=True, residual=False, padding='same'):
 
     def conv_block(m, dim, acti, bn, res, do, pd='same'):
@@ -77,9 +77,9 @@ def unet_with_denses(img_shape=(512, 384, 1),
              n]) if res else n
 
     def dense_link(m, acti, do, depth):
-        shape = (32 * (depth + 1), 24 * (depth + 1))
+        shape = (32 * depth, 24 * depth)
         n = Flatten()(m)
-        n = Dense(units=24 * (depth + 1), kernel_initializer=initializers.HeNormal())(n)
+        n = Dense(units=24 * depth, kernel_initializer=initializers.HeNormal())(n)
         n = LeakyReLU()(n) if acti == 'relu' else activations.sigmoid(n)
         n = Dropout(do)(n) if do else n
         n = Dense(units=shape[0] * shape[1], kernel_initializer=initializers.HeNormal())(n)
@@ -102,7 +102,7 @@ def unet_with_denses(img_shape=(512, 384, 1),
                                     kernel_initializer=initializers.HeNormal())(m)
                 m = BatchNormalization()(m) if bn else m
                 m = LeakyReLU()(m) if acti == 'relu' else activations.sigmoid(m)
-            n = dense_link(n, acti, do, depth) if depth < 2 else n
+            n = dense_link(n, acti, do, depth) if depth <= 2 else n
             n = Concatenate()(
                 [Cropping2D(cropping=(2 ** (depth - 1) * 12 - 8))(n),
                  m]) if padding == 'valid' else Concatenate()(
