@@ -10,7 +10,7 @@ validset_loader = data_io.ImageDataGenerator(batch_size=bs, mode='valid')
 
 # Training network
 from tensorflow.keras.utils import plot_model
-from tensorflow.keras.callbacks import ReduceLROnPlateau, EarlyStopping, Tensorboad, ModelCheckpoint
+from tensorflow.keras.callbacks import ReduceLROnPlateau, EarlyStopping, ModelCheckpoint
 from tensorflow.keras.losses import BinaryCrossentropy
 import tensorflow.keras.optimizers as optim
 import network
@@ -19,6 +19,7 @@ print("Training for a new UNet model:")
 
 model = network.unet_with_denses(img_shape=(256,192,1))
 plot_model(model, show_shapes=True )
+model.summary()
 model.compile(loss=BinaryCrossentropy(from_logits=False), optimizer=optim.Adam(learning_rate=0.0001))
 
 reduce_lr = ReduceLROnPlateau(
@@ -26,7 +27,6 @@ reduce_lr = ReduceLROnPlateau(
     mode='auto', min_lr=0.00001)
 stop_condition = EarlyStopping(
     monitor='val_loss', patience=21, min_delta=0.001)
-tensorboard = Tensorboard(log_dir='./log')
 checkpoint = ModelCheckpoint(filepath='./saved_model/best',
     monitor='val_loss',
     save_best_only='True',
@@ -35,7 +35,7 @@ checkpoint = ModelCheckpoint(filepath='./saved_model/best',
 
 history = model.fit(trainset_loader, batch_size=bs, epochs=200,
                     validation_data=validset_loader, workers=16, max_queue_size=16,
-                    callbacks=[reduce_lr, stop_condition, tensorboard, checkpoint])
+                    callbacks=[reduce_lr, stop_condition, checkpoint])
 
 # Save model and training log
 model.save(saved_model)
