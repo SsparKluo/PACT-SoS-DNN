@@ -77,10 +77,10 @@ def unet_with_denses(img_shape=(512, 384, 1),
              n]) if res else n
 
     def dense_link(m, acti, do, depth):
-        d = depth + 1
-        shape = (16 * d, 12 * d)
+        shape = (16 * 2**depth, 12 * 2**depth)
         n = Flatten()(m)
-        n = Dense(units=12 * d, kernel_initializer=initializers.HeNormal())(n)
+        n = Dense(units=12 * 2**depth, kernel_initializer=initializers.HeNormal())(n)
+        n = BatchNormalization()(n)
         n = LeakyReLU()(n) if acti == 'relu' else activations.sigmoid(n)
         n = Dropout(do)(n) if do else n
         n = Dense(units=shape[0] * shape[1], kernel_initializer=initializers.HeNormal())(n)
@@ -107,7 +107,7 @@ def unet_with_denses(img_shape=(512, 384, 1),
             n = Concatenate()(
                 [Cropping2D(cropping=(2 ** (depth - 1) * 12 - 8))(n),
                  m]) if padding == 'valid' else Concatenate()(
-                [n, m]) if depth < 2 else m
+                [n, m]) if depth <= 2 else m
             m = conv_block(n, dim, acti, bn, res, do, pd)
         else:
             m = conv_block(m, dim, acti, bn, res, do, pd)
