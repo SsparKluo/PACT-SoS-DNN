@@ -10,7 +10,7 @@ import random
 
 class ImageDataGenerator(Sequence):
     def __init__(self, path="../simulation_dual_SoS/", batch_size=8,
-                 shuffle=True, mode="train", data_augmentation="True") -> None:
+                 shuffle=True, mode="train", data_augmentation="True", output_size=(192,256)) -> None:
         super().__init__()
         self.mode = mode
         if self.mode == 'train':
@@ -26,7 +26,7 @@ class ImageDataGenerator(Sequence):
         self.mag = 4 if self.aug else 2
         self.len = len(self.paths) * self.mag
         self.indexes = np.arange(self.len)
-
+        self.output_size = output_size
         if self.shuffle:
             random.shuffle(self.indexes)
 
@@ -48,11 +48,12 @@ class ImageDataGenerator(Sequence):
 
             img = cv2.flip(img, 1) if self.aug and i % 2 else img
             # 0 for raw image; 1 for flipping
-
+            img = cv2.resize(img, self.output_size)
             gt = loadmat("{}/GT.mat".format(folderpath))
             gt = gt['GT']
             gt = cv2.flip(gt, 1) if self.aug and i % 2 else gt
             gt = (gt - gt.min()) / (gt.max() - gt.min())
+            gt = cv2.resize(gt, self.output_size)
             inputs.append(np.array(img))
             targets.append(np.array(gt))
         return np.expand_dims(

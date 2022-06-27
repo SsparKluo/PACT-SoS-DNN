@@ -77,9 +77,9 @@ def unet_with_denses(img_shape=(512, 384, 1),
              n]) if res else n
 
     def dense_link(m, acti, do, depth):
-        shape = (32 * depth, 24 * depth)
+        shape = (16 * depth, 12 * depth)
         n = Flatten()(m)
-        n = Dense(units=24 * depth, kernel_initializer=initializers.HeNormal())(n)
+        n = Dense(units=12 * depth, kernel_initializer=initializers.HeNormal())(n)
         n = LeakyReLU()(n) if acti == 'relu' else activations.sigmoid(n)
         n = Dropout(do)(n) if do else n
         n = Dense(units=shape[0] * shape[1], kernel_initializer=initializers.HeNormal())(n)
