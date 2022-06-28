@@ -183,9 +183,9 @@ def cnn_dense(img_shape=(256, 192, 1),
     concat3 = LeakyReLU()(concat3)
 
     up_dense3 = UpSampling1D(size=2)(concat3)
-    concat2 = Concatenate(axis=2)([up_dense3, dense2])
+    # concat2 = Concatenate(axis=2)([up_dense3, dense2])
     concat2 = Conv1D(4, 3, padding=padding,
-                     kernel_initializer=initializers.HeNormal())(concat2)
+                     kernel_initializer=initializers.HeNormal())(up_dense3)
     concat2 = BatchNormalization()(concat2)
     concat2 = LeakyReLU()(concat2)
     concat2 = Conv1D(2, 3, padding=padding,
