@@ -8,7 +8,7 @@ import data_io
 import os
 
 # Basic configuration
-bs = 8
+bs = 12
 saved_model = './saved_model/cnn_dense'
 best_checkpoint = './saved_model/cnn_dense_best'
 figure_path = './figure/'
