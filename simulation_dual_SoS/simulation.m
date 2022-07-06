@@ -11,7 +11,7 @@ kgrid = kWaveGrid(Nx, dx, Ny, dy);
 kgrid.setTime(901, 25e-9)
 
 % Simulation loop
-for i = 551:700
+for i = 701:701
     clear("source");
     clear("medium");
     clear("sensor");
@@ -49,7 +49,7 @@ for i = 551:700
     medium_SoS = waterSoundSpeed(30); % acquire the SoS of water with T = 30 Celsius
     medium.sound_speed = medium_SoS * ones(Nx, Ny);
     medium.density = 1000 * ones(Nx, Ny);
-    tissue_SoS = 1540 + 40 * randn;
+    tissue_SoS = 1600 + 40 * randn;
 
     for y = 1:Ny
         medium.sound_speed(round(Y(y)):Nx, y) = tissue_SoS;
