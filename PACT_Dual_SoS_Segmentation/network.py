@@ -4,6 +4,7 @@ from tensorflow.keras.layers import Conv2D, MaxPooling2D, Conv2DTranspose, Conca
 from tensorflow.keras.layers import Conv1D, UpSampling1D
 from tensorflow.keras.layers import UpSampling2D, Dropout, BatchNormalization, Cropping2D, LeakyReLU
 from tensorflow.keras.layers import Dense, Flatten, Reshape
+from tensorflow.keras.layers import ConvLSTM1D, TimeDistributed, RepeatVector
 from tensorflow.keras import initializers, activations
 from keras.backend import int_shape
 # import layer_object
@@ -204,4 +205,27 @@ def cnn_dense(img_shape=(256, 192, 1),
     concat1 = LeakyReLU()(concat1)
 
     output = Conv1D(out_ch, 1, activation='tanh')(concat1)
+    return Model(inputs=input, outputs=output)
+
+
+def convlstm(img_shape=(901, 1, 128, 1), out_ch=1, start_ch=8,
+             activation='relu', dropout=0.5, padding='same'):
+
+    input = Input(shape=img_shape, name='input')
+
+    seq = ConvLSTM1D(start_ch, 5, padding=padding, data_format='channels_last',
+                     activation=activation, kernel_initializer=initializers.HeNormal(),
+                     return_sequences=True, dropout=dropout, recurrent_dropout=0.2)(input)
+    seq = ConvLSTM1D(start_ch, 3, padding=padding, data_format='channels_last',
+                     activation=activation, kernel_initializer=initializers.HeNormal(),
+                     dropout=dropout, recurrent_dropout=0.2)(seq)
+    decoder_input = RepeatVector(img_shape[0])
+    seq = ConvLSTM1D(start_ch, 3, padding=padding, data_format='channels_last',
+                     activation=activation, kernel_initializer=initializers.HeNormal(),
+                     return_sequences=True, dropout=dropout,
+                     recurrent_dropout=0.2)(decoder_input)
+    seq = ConvLSTM1D(start_ch, 5, padding=padding, data_format='channels_last',
+                     activation=activation, kernel_initializer=initializers.HeNormal(),
+                     return_sequences=True, dropout=dropout, recurrent_dropout=0.2)(seq)
+    output = TimeDistributed(Conv1D(out_ch, 3, padding=padding))(seq)
     return Model(inputs=input, outputs=output)

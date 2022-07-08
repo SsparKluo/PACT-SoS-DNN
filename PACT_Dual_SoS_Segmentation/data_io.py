@@ -124,4 +124,64 @@ class ImageDataGenerator2(Sequence):
 
 
 class RawDataGenerator(Sequence):
-    pass
+    def __init__(
+            self, path="../simulation_dual_SoS/", batch_size=8, shuffle=True, time=60,
+            mode="train", data_augmentation="True", output_size=(192, 256)) -> None:
+        super().__init__()
+        self.mode = mode
+        if self.mode == 'train':
+            self.paths = glob("{}[0-9]*".format(path))
+        elif self.mode == 'valid':
+            self.paths = glob("{}v_[0-9]*".format(path))
+        elif self.mode == 'test':
+            self.paths = glob("{}t_[0-9]*".format(path))
+
+        self.bs = batch_size
+        self.time = time
+        self.shuffle = shuffle
+        self.aug = data_augmentation
+        self.mag = 2 if self.aug else 1
+        self.len = len(self.paths) * self.mag
+        self.indexes = np.arange(self.len)
+        self.output_size = output_size
+        if self.shuffle:
+            random.shuffle(self.indexes)
+
+    def __len__(self):
+        return ceil(self.len / self.bs)
+
+    def on_epoch_end(self):
+        if self.shuffle == True:
+            random.shuffle(self.indexes)
+
+    def __getitem__(self, idx):
+        batch_paths = self.indexes[idx * self.bs: (idx + 1) * self.bs]
+        inputs = []
+        targets = []
+        for i in batch_paths:
+            folderpath = self.paths[i // self.mag]
+            op = i % self.mag
+            # 0 for raw data; 1 for flipped data
+            temp = loadmat("{}/raw_data_128.mat".format(folderpath))
+            real_data = np.transpose(
+                np.flip(
+                    np.array(
+                        temp['noisy_sensor_data']),
+                    axis=0) if op else np.array(
+                    temp['noisy_sensor_data']))
+            temp = loadmat("{}/GT_Raw_128.mat".format(folderpath))
+            gt = np.transpose(
+                np.flip(
+                    np.array(
+                        temp['sensor_data']),
+                    axis=0) if op else np.array(
+                    temp['sensor_data']))
+            padding = np.zeros((self.time, len(gt[-1])))
+            gt = np.concatenate((padding, gt), axis=0)
+            real_data = np.concatenate((padding, real_data), axis=0)
+            real_seq = [real_data[j: j + self.time]
+                        for j in range(len(real_data) - self.time)]
+            gt_seq = [gt[j:j + self.time] for j in range(len(gt) - self.time)]
+            inputs.append(np.array(real_seq))
+            targets.append(np.array(gt_seq))
+        return np.expand_dims(np.array(inputs), axis=-1), np.array(targets)
