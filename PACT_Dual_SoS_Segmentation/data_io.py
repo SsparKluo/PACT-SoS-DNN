@@ -54,8 +54,10 @@ class ImageDataGenerator(Sequence):
             gt = cv2.flip(gt, 1) if self.aug and i % 2 else gt
             gt = (gt - gt.min()) / (gt.max() - gt.min())
             gt = cv2.resize(gt, self.output_size)
-            inputs.append(np.array(img))
-            targets.append(np.array(gt))
+            gt = np.array(gt)
+            img = np.array(img) + 10 * gt
+            inputs.append(img)
+            targets.append(gt)
         return np.expand_dims(
             np.array(inputs), axis=-1), np.expand_dims(np.array(targets), axis=-1)
 

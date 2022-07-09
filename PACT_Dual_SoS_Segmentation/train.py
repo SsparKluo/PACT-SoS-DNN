@@ -9,8 +9,8 @@ import os
 
 # Basic configuration
 bs = 12
-saved_model = './saved_model/cnn_dense'
-best_checkpoint = './saved_model/cnn_dense_best'
+saved_model = './saved_model/unet'
+best_checkpoint = './saved_model/unet_best'
 figure_path = './figure/'
 
 if not os.path.exists(saved_model):
@@ -22,14 +22,14 @@ if not os.path.exists(figure_path):
 
 # import data
 
-trainset_loader = data_io.ImageDataGenerator2(batch_size=bs)
-validset_loader = data_io.ImageDataGenerator2(batch_size=bs, mode='valid')
+trainset_loader = data_io.ImageDataGenerator(batch_size=bs)
+validset_loader = data_io.ImageDataGenerator(batch_size=bs, mode='valid')
 
 # Training network
 
 print("Training for a new UNet model:")
 
-model = network.cnn_dense(img_shape=(256, 192, 1))
+model = network.unet(img_shape=(256, 192, 1))
 plot_model(model, show_shapes=True)
 model.summary()
 model.compile(loss=MeanSquaredError(),
@@ -59,4 +59,4 @@ plt.title('Model loss')
 plt.ylabel('Loss')
 plt.xlabel('Epoch')
 plt.legend(['Train', 'Test'], loc='upper left')
-plt.savefig(figure_path + '/cnn_dense - Model loss.jpg')
+plt.savefig(figure_path + '/unet - Model loss.jpg')
