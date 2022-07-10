@@ -207,7 +207,7 @@ def cnn_dense(img_shape=(256, 192, 1),
     output = Conv1D(out_ch, 1, activation='tanh')(concat1)
     return Model(inputs=input, outputs=output)
 
-
+'''
 def convlstm(img_shape=(901, 1, 128, 1), out_ch=1, start_ch=8,
              activation='relu', dropout=0.5, padding='same'):
 
@@ -229,3 +229,4 @@ def convlstm(img_shape=(901, 1, 128, 1), out_ch=1, start_ch=8,
                      return_sequences=True, dropout=dropout, recurrent_dropout=0.2)(seq)
     output = TimeDistributed(Conv1D(out_ch, 3, padding=padding))(seq)
     return Model(inputs=input, outputs=output)
+'''

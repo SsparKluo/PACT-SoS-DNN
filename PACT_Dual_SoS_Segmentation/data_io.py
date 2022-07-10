@@ -114,6 +114,7 @@ class ImageDataGenerator2(Sequence):
             gt = cv2.resize(gt, self.output_size)
             
             gt = np.array(gt)
+            inputs.append(np.array(gt))
             img = np.array(img) + 10 * gt
             
             gt = cv2.transpose(gt)
@@ -121,7 +122,7 @@ class ImageDataGenerator2(Sequence):
             gt = np.array([np.where(row == 1)[0][0] for row in gt])
             gt = (gt - 127.5) / 127.5
 
-            inputs.append(np.array(img))
+            # inputs.append(np.array(img))
             targets.append(np.array(gt))
         return np.expand_dims(np.array(inputs), axis=-1), np.array(targets)
 
