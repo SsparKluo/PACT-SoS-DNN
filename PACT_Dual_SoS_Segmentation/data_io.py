@@ -112,7 +112,12 @@ class ImageDataGenerator2(Sequence):
             gt = cv2.flip(gt, 1) if self.aug and i % 2 else gt
             gt = (gt - gt.min()) / (gt.max() - gt.min())
             gt = cv2.resize(gt, self.output_size)
+            
+            gt = np.array(gt)
+            img = np.array(img) + 10 * gt
+            
             gt = cv2.transpose(gt)
+            
             gt = np.array([np.where(row == 1)[0][0] for row in gt])
             gt = (gt - 127.5) / 127.5
 
