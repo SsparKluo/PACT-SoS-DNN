@@ -243,7 +243,7 @@ class ImageDataGenerator3(Sequence):
             gt = cv2.flip(gt, 1) if self.aug and i % 2 else gt
             gt = cv2.resize(gt, self.output_size)
             inputs.append(np.array(img))
-            targets.append(np.array(gt))
+            targets.append(np.array(gt)/255.0)
         return np.expand_dims(
             np.array(inputs), axis=-1), np.expand_dims(np.array(targets), axis=-1)
 
