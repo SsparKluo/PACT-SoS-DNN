@@ -239,7 +239,7 @@ class ImageDataGenerator3(Sequence):
             img = cv2.flip(img, 1) if self.aug and i % 2 else img
             # 0 for raw image; 1 for flipping
             img = cv2.resize(img, self.output_size)
-            gt = cv2.imread("{}/s0.png".format(folderpath))
+            gt = cv2.imread("{}/s0.png".format(folderpath), 0)
             gt = cv2.flip(gt, 1) if self.aug and i % 2 else gt
             gt = cv2.resize(gt, self.output_size)
             inputs.append(np.array(img))
