@@ -9,8 +9,10 @@ import random
 
 
 class ImageDataGenerator(Sequence):
-    def __init__(self, path="../simulation_dual_SoS/", batch_size=8, shuffle=True,
-                 mode="train", data_augmentation="True", output_size=(192, 256)) -> None:
+    def __init__(
+            self, path="../simulation_dual_SoS/", batch_size=8, shuffle=True,
+            mode="train", data_augmentation="True", output_size=(192, 256),
+            overlying=True) -> None:
         super().__init__()
         self.mode = mode
         if self.mode == 'train':
@@ -27,6 +29,7 @@ class ImageDataGenerator(Sequence):
         self.len = len(self.paths) * self.mag
         self.indexes = np.arange(self.len)
         self.output_size = output_size
+        self.overlying = overlying
         if self.shuffle:
             random.shuffle(self.indexes)
 
@@ -55,9 +58,8 @@ class ImageDataGenerator(Sequence):
             gt = (gt - gt.min()) / (gt.max() - gt.min())
             gt = cv2.resize(gt, self.output_size)
             gt = np.array(gt)
-            img = np.array(img) + 10 * gt
+            img = np.array(img) + 5 * gt if self.overlying else np.array(img)
             inputs.append(img)
-            # inputs.append(gt)
             targets.append(gt)
         return np.expand_dims(
             np.array(inputs), axis=-1), np.expand_dims(np.array(targets), axis=-1)
@@ -69,7 +71,8 @@ class ImageDataGenerator(Sequence):
 
 class ImageDataGenerator2(Sequence):
     def __init__(self, path="../simulation_dual_SoS/", batch_size=8, shuffle=True,
-                 mode="train", data_augmentation="True", output_size=(192, 256)) -> None:
+                 mode="train", data_augmentation="True", output_size=(192, 256),
+                 overlying=True) -> None:
         super().__init__()
         self.mode = mode
         if self.mode == 'train':
@@ -86,6 +89,7 @@ class ImageDataGenerator2(Sequence):
         self.len = len(self.paths) * self.mag
         self.indexes = np.arange(self.len)
         self.output_size = output_size
+        self.overlying = overlying
         if self.shuffle:
             random.shuffle(self.indexes)
 
@@ -114,12 +118,9 @@ class ImageDataGenerator2(Sequence):
             gt = (gt - gt.min()) / (gt.max() - gt.min())
             gt = cv2.resize(gt, self.output_size)
             
-            gt = np.array(gt)
-            inputs.append(np.array(gt))
-            img = np.array(img) + 10 * gt
-            
+            img = np.array(img) + 5 * np.array(gt) if self.overlying else np.array(img)
+
             gt = cv2.transpose(gt)
-            
             gt = np.array([np.where(row == 1)[0][0] for row in gt])
             gt = (gt - 127.5) / 127.5
 
