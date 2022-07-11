@@ -124,7 +124,7 @@ class ImageDataGenerator2(Sequence):
             gt = np.array([np.where(row == 1)[0][0] for row in gt])
             gt = (gt - 127.5) / 127.5
 
-            # inputs.append(np.array(img))
+            inputs.append(np.array(img))
             targets.append(np.array(gt))
         return np.expand_dims(np.array(inputs), axis=-1), np.array(targets)
 

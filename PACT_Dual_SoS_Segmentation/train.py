@@ -9,16 +9,14 @@ import os
 
 # Basic configuration
 bs = 32
-saved_model = './saved_model/unet2'
-best_checkpoint = './saved_model/unet2'
-figure_path = './figure/unet2 - Model loss.jpg'
+saved_model = './saved_model/unet_dense_2'
+best_checkpoint = './saved_model/unet_dense_2_best'
+figure_path = './figure/unet_dense_2 - Model loss.jpg'
 
 if not os.path.exists(saved_model):
     os.mkdir(saved_model)
 if not os.path.exists(best_checkpoint):
     os.mkdir(best_checkpoint)
-if not os.path.exists(figure_path):
-    os.mkdir(figure_path)
 
 # import data
 
@@ -29,11 +27,13 @@ validset_loader = data_io.ImageDataGenerator(batch_size=bs, mode='valid')
 
 print("Training for a new UNet model:")
 
-model = network.unet(img_shape=(256, 192, 1), batchnorm=True)
+model = network.unet_with_dense(img_shape=(256, 192, 1), batchnorm=True)
 plot_model(model, show_shapes=True)
 model.summary()
 model.compile(loss=BinaryCrossentropy(from_logits=False),
               optimizer=optim.Adam(learning_rate=0.0001))
+#model.compile(loss=MeanSquaredError(),
+#              optimizer=optim.Adam(learning_rate=0.0001))
 
 reduce_lr = ReduceLROnPlateau(
     verbose=1, factor=0.1, min_delta=0.001, monitor='val_loss', patience=15,

@@ -61,7 +61,7 @@ def unet(
     return Model(inputs=input, outputs=output)
 
 
-def unet_with_denses(img_shape=(512, 384, 1),
+def unet_with_dense(img_shape=(512, 384, 1),
                      out_ch=1, start_ch=64, depth=4, inc_rate=2., activation='relu',
                      dropout=0.5, batchnorm=False, maxpool=True, upconv=True,
                      residual=False, padding='same'):
@@ -165,12 +165,12 @@ def cnn_dense(img_shape=(256, 192, 1),
     conv3 = conv_block(maxpool2, start_ch * 4, activation,
                        batchnorm, residual, dropout, padding)
     maxpool3 = MaxPooling2D()(conv3)
-    dense3 = dense_link(maxpool3, activation, dropout, 96, 48)
+    dense3 = dense_link(maxpool3, activation, dropout, 192, 48)
 
     conv4 = conv_block(maxpool3, start_ch * 8, activation,
                        batchnorm, residual, dropout, padding)
     maxpool4 = MaxPooling2D()(conv4)
-    dense4 = dense_link(maxpool4, activation, dropout, 48, 24)
+    dense4 = dense_link(maxpool4, activation, dropout, 192, 24)
 
     up_dense4 = UpSampling1D(size=2)(dense4)
     concat3 = Concatenate(axis=2)([up_dense4, dense3])
@@ -204,7 +204,7 @@ def cnn_dense(img_shape=(256, 192, 1),
     concat1 = BatchNormalization()(concat1)
     concat1 = LeakyReLU()(concat1)
 
-    output = Conv1D(out_ch, 1, activation='tanh')(concat1)
+    output = Conv1D(out_ch, 1)(concat1)
     return Model(inputs=input, outputs=output)
 
 '''
