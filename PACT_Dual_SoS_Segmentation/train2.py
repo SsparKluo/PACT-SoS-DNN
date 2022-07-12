@@ -10,30 +10,47 @@ from tensorflow.keras.models import load_model
 
 # Basic configuration
 bs = 12
-saved_model = './saved_model/cnn_dense_2'
-best_checkpoint = './saved_model/cnn_dense_best_2'
-figure_path = './figure/'
+model_name = 'cnn_dense_2'
+saved_model = './saved_model/{}'.format(model_name)
+best_checkpoint = './saved_model/{}_best_2'.format(model_name)
+figure_path = './figure/{} - Model loss.jpg/'.format(model_name)
 
 if not os.path.exists(saved_model):
     os.mkdir(saved_model)
 if not os.path.exists(best_checkpoint):
     os.mkdir(best_checkpoint)
-if not os.path.exists(figure_path):
-    os.mkdir(figure_path)
 
 # import data
-
-trainset_loader = data_io.ImageDataGenerator2(batch_size=bs)
-validset_loader = data_io.ImageDataGenerator2(batch_size=bs, mode='valid')
+trainset_loader = data_io.ImageDataGenerator(batch_size=bs)
+validset_loader = data_io.ImageDataGenerator(batch_size=bs, mode='valid')
 
 # Training network
-
 print("Training for a new UNet model:")
 
-model = load_model('./saved_model/cnn_dense_2')
+decoder_model = load_model('./saved_model/unet_dense_2')
+encoder_model = load_model('./saved_model/unet_forFT')
+model = network.unet_with_dense(img_shape=(256,192,1), batchnorm=True)
+
+for idx, layer in enumerate(model.layers):
+    if 'up' in layer.name:
+        break
+    if 'Conv2D' not in layer.name:
+        continue
+    layer.set_weights(encoder_model.layers[idx].get_weights())
+    layer.trainable = False
+
+reverse_layers = model.layers[::-1]
+
+for idx, layer in enumerate(reverse_layers, start=1):
+    if 'Conv2D' not in layer.name:
+        continue
+    layer.set_weights(encoder_model.layers[-idx].get_weights())
+    layer.trainable = False
+
 model.summary()
-model.compile(loss=MeanSquaredError(),
-              optimizer=optim.Adam(learning_rate=0.00005))
+
+model.compile(loss=BinaryCrossentropy(from_logits=False),
+              optimizer=optim.Adam(learning_rate=0.0005))
 
 reduce_lr = ReduceLROnPlateau(
     verbose=1, factor=0.1, min_delta=0.001, monitor='val_loss', patience=10,
@@ -58,4 +75,4 @@ plt.title('Model loss')
 plt.ylabel('Loss')
 plt.xlabel('Epoch')
 plt.legend(['Train', 'Test'], loc='upper left')
-plt.savefig(figure_path + '/cnn_dense_3 - Model loss.jpg')
+plt.savefig(figure_path)
