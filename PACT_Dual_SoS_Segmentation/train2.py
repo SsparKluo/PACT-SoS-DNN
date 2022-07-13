@@ -10,7 +10,7 @@ from tensorflow.keras.models import load_model
 
 # Basic configuration
 bs = 12
-model_name = 'cnn_dense_2'
+model_name = 'cnn_dense_FT'
 saved_model = './saved_model/{}'.format(model_name)
 best_checkpoint = './saved_model/{}_best_2'.format(model_name)
 figure_path = './figure/{} - Model loss.jpg/'.format(model_name)
@@ -34,7 +34,7 @@ model = network.unet_with_dense(img_shape=(256,192,1), batchnorm=True)
 for idx, layer in enumerate(model.layers):
     if 'up' in layer.name:
         break
-    if 'Conv2D' not in layer.name:
+    if 'conv2d' not in layer.name:
         continue
     layer.set_weights(encoder_model.layers[idx].get_weights())
     layer.trainable = False
@@ -42,7 +42,9 @@ for idx, layer in enumerate(model.layers):
 reverse_layers = model.layers[::-1]
 
 for idx, layer in enumerate(reverse_layers, start=1):
-    if 'Conv2D' not in layer.name:
+    if idx > 7:
+        break
+    if 'conv2d' not in layer.name:
         continue
     layer.set_weights(encoder_model.layers[-idx].get_weights())
     layer.trainable = False
