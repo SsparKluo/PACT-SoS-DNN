@@ -106,11 +106,11 @@ def unet_with_dense(img_shape=(512, 384, 1),
                                     kernel_initializer=initializers.HeNormal())(m)
                 m = BatchNormalization()(m) if bn else m
                 m = LeakyReLU()(m) if acti == 'relu' else activations.sigmoid(m)
-            n = dense_link(n, acti, do, depth) if depth <= 3 else n
+            n = dense_link(n, acti, do, depth) if depth <= 2 else n
             n = Concatenate()(
                 [Cropping2D(cropping=(2 ** (depth - 1) * 12 - 8))(n),
                  m]) if padding == 'valid' else Concatenate()(
-                [n, m]) if depth <= 3 else m
+                [n, m]) if depth <= 2 else m
             m = conv_block(n, dim, acti, bn, res, do, pd)
         else:
             m = conv_block(m, dim, acti, bn, res, do, pd)
