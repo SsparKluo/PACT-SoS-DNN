@@ -21,11 +21,11 @@ if not os.path.exists(best_checkpoint):
     os.mkdir(best_checkpoint)
 
 # import data
-trainset_loader = data_io.ImageDataGenerator(batch_size=bs)
-validset_loader = data_io.ImageDataGenerator(batch_size=bs, mode='valid')
+trainset_loader = data_io.ImageDataGenerator(batch_size=bs, overlying=False)
+validset_loader = data_io.ImageDataGenerator(batch_size=bs, overlying=False, mode='valid')
 
 # Training network
-'''
+
 decoder_model = load_model('./saved_model/unet_dense_2')
 encoder_model = load_model('./saved_model/unet_forFT')
 model = network.unet_with_dense(img_shape=(256,192,1), batchnorm=True)
@@ -47,28 +47,23 @@ for idx, layer in enumerate(reverse_layers, start=1):
         continue
     layer.set_weights(encoder_model.layers[-idx].get_weights())
     layer.trainable = False
-'''
 
-model = load_model('./saved_model/cnn_dense_FT')
+# model = load_model('./saved_model/cnn_dense_FT')
 model.summary()
 
 model.compile(loss=BinaryCrossentropy(from_logits=False),
-              optimizer=optim.Adam(learning_rate=0.0002))
+              optimizer=optim.Adam(learning_rate=0.0005))
 
 reduce_lr = ReduceLROnPlateau(
     verbose=1, factor=0.1, min_delta=0.001, monitor='val_loss', patience=20,
     mode='auto', min_lr=0.00001)
 stop_condition = EarlyStopping(
     monitor='val_loss', patience=41, min_delta=0.001)
-checkpoint = ModelCheckpoint(filepath=best_checkpoint,
-                             monitor='val_loss',
-                             save_best_only='True',
-                             mode='auto',
-                             period=1)
 
 history = model.fit(trainset_loader, batch_size=bs, epochs=400,
                     validation_data=validset_loader, workers=16, max_queue_size=16,
-                    callbacks=[reduce_lr, stop_condition, checkpoint])
+                    callbacks=[reduce_lr, stop_condition],
+                    initial_epoch=0)
 
 # Save model and training log
 model.save(saved_model)
