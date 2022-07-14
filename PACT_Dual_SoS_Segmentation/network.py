@@ -209,7 +209,7 @@ def fcn_dense(img_shape=(256, 192, 1),
     return Model(inputs=input, outputs=output)
 
 
-def fcn_dense(img_shape=(256, 192, 1),
+def cnn_dense(img_shape=(256, 192, 1),
               out_ch=1, start_ch=64, depth=4, inc_rate=2., activation='relu',
               dropout=0.5, batchnorm=False, maxpool=True, upconv=True,
               residual=False, padding='same'):
@@ -237,15 +237,15 @@ def fcn_dense(img_shape=(256, 192, 1),
                   kernel_initializer=initializers.HeNormal())(n)
         return n
 
-    n = Input(shape=img_shape)
-    n = conv_block(n, start_ch, activation, batchnorm, residual, dropout, padding)
-    n = MaxPooling2D(n)
+    input = Input(shape=img_shape)
+    n = conv_block(input, start_ch, activation, batchnorm, residual, dropout, padding)
+    n = MaxPooling2D()(n)
     n = conv_block(n, 2 * start_ch, activation, batchnorm, residual, dropout, padding)
-    n = MaxPooling2D(n)
+    n = MaxPooling2D()(n)
     n = conv_block(n, 4 * start_ch, activation, batchnorm, residual, dropout, padding)
-    n = MaxPooling2D(n)
+    n = MaxPooling2D()(n)
     m1 = conv_block(n, 8 * start_ch, activation, batchnorm, residual, dropout, padding)
-    n = MaxPooling2D(m1)
+    n = MaxPooling2D()(m1)
     m2 = conv_block(n, 8 * start_ch, activation, batchnorm, residual, dropout, padding)
     dense2 = dense_link(m2, activation, dropout, 0)
     dense1 = dense_link(m1, activation, dropout, 1)
