@@ -62,9 +62,9 @@ def unet(
 
 
 def unet_with_dense(img_shape=(512, 384, 1),
-                     out_ch=1, start_ch=64, depth=4, inc_rate=2., activation='relu',
-                     dropout=0.5, batchnorm=False, maxpool=True, upconv=True,
-                     residual=False, padding='same'):
+                    out_ch=1, start_ch=64, depth=4, inc_rate=2., activation='relu',
+                    dropout=0.5, batchnorm=False, maxpool=True, upconv=True,
+                    residual=False, padding='same'):
 
     def conv_block(m, dim, acti, bn, res, do, pd='same'):
         n = Conv2D(dim, 3, padding=pd, kernel_initializer=initializers.HeNormal())(m)
@@ -81,12 +81,17 @@ def unet_with_dense(img_shape=(512, 384, 1),
     def dense_link(m, acti, do, depth):
         shape = (16 * 2**depth, 12 * 2**depth)
         n = Flatten()(m)
-        n = Dense(units=12 * 2**depth, kernel_initializer=initializers.HeNormal())(n)
+        n = Dense(
+            units=12 * 2**depth,
+            kernel_initializer=initializers.HeNormal(),
+            name=str(depth) + ' layer_1')(n)
         n = BatchNormalization()(n)
         n = LeakyReLU()(n) if acti == 'relu' else activations.sigmoid(n)
         n = Dropout(do)(n) if do else n
-        n = Dense(units=shape[0] * shape[1],
-                  kernel_initializer=initializers.HeNormal())(n)
+        n = Dense(
+            units=shape[0] * shape[1],
+            kernel_initializer=initializers.HeNormal(),
+            name=str(depth) + ' layer_2')(n)
         return Reshape(target_shape=(shape[0], shape[1], 1))(n)
 
     def level_block(m, dim, depth, inc, acti, do, bn, mp, up, res, pd):
@@ -125,7 +130,7 @@ def unet_with_dense(img_shape=(512, 384, 1),
     return Model(inputs=input, outputs=output)
 
 
-def cnn_dense(img_shape=(256, 192, 1),
+def fcn_dense(img_shape=(256, 192, 1),
               out_ch=1, start_ch=64, depth=4, inc_rate=2., activation='relu',
               dropout=0.5, batchnorm=False, maxpool=True, upconv=True,
               residual=False, padding='same'):
@@ -206,6 +211,42 @@ def cnn_dense(img_shape=(256, 192, 1),
 
     output = Conv1D(out_ch, 1)(concat1)
     return Model(inputs=input, outputs=output)
+
+
+def fcn_dense(img_shape=(256, 192, 1),
+              out_ch=1, start_ch=64, depth=4, inc_rate=2., activation='relu',
+              dropout=0.5, batchnorm=False, maxpool=True, upconv=True,
+              residual=False, padding='same'):
+
+    def conv_block(m, dim, acti, bn, res, do, pd='same'):
+        n = Conv2D(dim, 3, padding=pd, kernel_initializer=initializers.HeNormal())(m)
+        n = BatchNormalization()(n) if bn else n
+        n = LeakyReLU()(n) if acti == 'relu' else activations.sigmoid(n)
+        n = Dropout(do)(n) if do else n
+        n = Conv2D(dim, 3, padding=pd, kernel_initializer=initializers.HeNormal())(n)
+        n = BatchNormalization()(n) if bn else n
+        n = LeakyReLU()(n) if acti == 'relu' else activations.sigmoid(n)
+        return Concatenate()(
+            [Cropping2D(cropping=2 if padding == 'valid' else 0)(m),
+             n]) if res else n
+
+    def dense_link(m, acti, do, depth):
+        shape = (16 * 2**depth, 12 * 2**depth)
+        n = Flatten()(m)
+        n = Dense(units=12 * 2**depth, kernel_initializer=initializers.HeNormal())(n)
+        n = BatchNormalization()(n)
+        n = LeakyReLU()(n) if acti == 'relu' else activations.sigmoid(n)
+        n = Dropout(do)(n) if do else n
+        n = Dense(units=shape[0] * shape[1],
+                  kernel_initializer=initializers.HeNormal())(n)
+        return Reshape(target_shape=(shape[0], shape[1], 1))(n)
+
+    n = Input(shape=img_shape)
+    for _ in range(depth):
+        n = conv_block(n, start_ch, activation, batchnorm, residual, dropout, pd='same')
+        n = MaxPooling2D(n)
+    output = Conv2D(out_ch, 1)(output)
+
 
 '''
 def convlstm(img_shape=(901, 1, 128, 1), out_ch=1, start_ch=8,
