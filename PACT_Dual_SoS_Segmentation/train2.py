@@ -10,7 +10,7 @@ from tensorflow.keras.models import load_model
 
 # Basic configuration
 bs = 12
-model_name = 'cnn_dense_FT2'
+model_name = 'cnn_dense_FT4'
 saved_model = './saved_model/{}'.format(model_name)
 best_checkpoint = './saved_model/{}_best_2'.format(model_name)
 figure_path = './figure/{} - Model loss.png'.format(model_name)
@@ -25,7 +25,7 @@ trainset_loader = data_io.ImageDataGenerator(batch_size=bs, overlying=False)
 validset_loader = data_io.ImageDataGenerator(batch_size=bs, overlying=False, mode='valid')
 
 # Training network
-
+'''
 decoder_model = load_model('./saved_model/unet_dense_2')
 encoder_model = load_model('./saved_model/unet_forFT')
 model = network.unet_with_dense(img_shape=(256,192,1), batchnorm=True)
@@ -47,18 +47,20 @@ for idx, layer in enumerate(reverse_layers, start=1):
         continue
     layer.set_weights(encoder_model.layers[-idx].get_weights())
     layer.trainable = False
-
-# model = load_model('./saved_model/cnn_dense_FT')
+'''
+model = load_model('./saved_model/cnn_dense_FT3')
+for layer in model.layers:
+    layer.trainable = True
 model.summary()
 
 model.compile(loss=BinaryCrossentropy(from_logits=False),
-              optimizer=optim.Adam(learning_rate=0.0005))
+              optimizer=optim.Adam(learning_rate=0.00005))
 
 reduce_lr = ReduceLROnPlateau(
-    verbose=1, factor=0.1, min_delta=0.001, monitor='val_loss', patience=20,
+    verbose=1, factor=0.1, min_delta=0.0001, monitor='val_loss', patience=20,
     mode='auto', min_lr=0.00001)
 stop_condition = EarlyStopping(
-    monitor='val_loss', patience=41, min_delta=0.001)
+    monitor='val_loss', patience=41, min_delta=0.0001)
 
 history = model.fit(trainset_loader, batch_size=bs, epochs=400,
                     validation_data=validset_loader, workers=16, max_queue_size=16,
