@@ -80,20 +80,14 @@ def unet_with_dense(img_shape=(512, 384, 1),
 
     def dense_link(m, acti, do, depth):
         shape = (16 * 2**depth, 12 * 2**depth)
-        name1 = str(depth) + 'dense1'
-        name2 = str(depth) + 'dense2'
         n = Flatten()(m)
-        n = Dense(
-            units=12 * 2**depth,
-            kernel_initializer=initializers.HeNormal(),
-            name=name1)(n)
+        n = Dense(units=12 * 2**depth,
+                  kernel_initializer=initializers.HeNormal())(n)
         n = BatchNormalization()(n)
         n = LeakyReLU()(n) if acti == 'relu' else activations.sigmoid(n)
         n = Dropout(do)(n) if do else n
-        n = Dense(
-            units=shape[0] * shape[1],
-            kernel_initializer=initializers.HeNormal(),
-            name=name2)(n)
+        n = Dense(units=shape[0] * shape[1],
+                  kernel_initializer=initializers.HeNormal())(n)
         return Reshape(target_shape=(shape[0], shape[1], 1))(n)
 
     def level_block(m, dim, depth, inc, acti, do, bn, mp, up, res, pd):
@@ -241,13 +235,25 @@ def fcn_dense(img_shape=(256, 192, 1),
         n = Dropout(do)(n) if do else n
         n = Dense(units=shape[0] * shape[1],
                   kernel_initializer=initializers.HeNormal())(n)
-        return Reshape(target_shape=(shape[0], shape[1], 1))(n)
+        return n
 
     n = Input(shape=img_shape)
-    for _ in range(depth):
-        n = conv_block(n, start_ch, activation, batchnorm, residual, dropout, pd='same')
-        n = MaxPooling2D(n)
-    output = Conv2D(out_ch, 1)(output)
+    n = conv_block(n, start_ch, activation, batchnorm, residual, dropout, padding)
+    n = MaxPooling2D(n)
+    n = conv_block(n, 2 * start_ch, activation, batchnorm, residual, dropout, padding)
+    n = MaxPooling2D(n)
+    n = conv_block(n, 4 * start_ch, activation, batchnorm, residual, dropout, padding)
+    n = MaxPooling2D(n)
+    m1 = conv_block(n, 8 * start_ch, activation, batchnorm, residual, dropout, padding)
+    n = MaxPooling2D(m1)
+    m2 = conv_block(n, 8 * start_ch, activation, batchnorm, residual, dropout, padding)
+    dense2 = dense_link(m2, activation, dropout, 0)
+    dense1 = dense_link(m1, activation, dropout, 1)
+    
+    n = Concatenate()([dense2, dense1])
+    n = Dense(units=1, activation='linear')(n)
+    output = n
+    return Model(inputs=input, outputs=output)
 
 
 '''
