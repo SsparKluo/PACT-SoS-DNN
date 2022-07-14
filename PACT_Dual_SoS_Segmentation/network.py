@@ -80,18 +80,20 @@ def unet_with_dense(img_shape=(512, 384, 1),
 
     def dense_link(m, acti, do, depth):
         shape = (16 * 2**depth, 12 * 2**depth)
+        name1 = str(depth) + 'dense1'
+        name2 = str(depth) + 'dense2'
         n = Flatten()(m)
         n = Dense(
             units=12 * 2**depth,
             kernel_initializer=initializers.HeNormal(),
-            name=str(depth) + ' layer_1')(n)
+            name=name1)(n)
         n = BatchNormalization()(n)
         n = LeakyReLU()(n) if acti == 'relu' else activations.sigmoid(n)
         n = Dropout(do)(n) if do else n
         n = Dense(
             units=shape[0] * shape[1],
             kernel_initializer=initializers.HeNormal(),
-            name=str(depth) + ' layer_2')(n)
+            name=name2)(n)
         return Reshape(target_shape=(shape[0], shape[1], 1))(n)
 
     def level_block(m, dim, depth, inc, acti, do, bn, mp, up, res, pd):
