@@ -11,13 +11,13 @@ kgrid = kWaveGrid(Nx, dx, Ny, dy);
 kgrid.setTime(901, 25e-9)
 
 % Simulation loop
-for i = 701:701
+for i = 100:109
     clear("source");
     clear("medium");
     clear("sensor");
 
     % create filepath
-    filepath = string(i) + "/";
+    filepath = 't_' + string(i) + "/";
 
     if ~exist(filepath, 'dir')
         mkdir(filepath)
@@ -96,6 +96,21 @@ for i = 701:701
         source.p0 = source.p0 + ellipsePixels .* magnitude;
     end
 
+    repeat_times = randi([2, 5]);
+
+    for a = 1:repeat_times
+        mag = 0.6 + rand(1) * 0.4;
+        st_point_x = randi([30, 354]);
+        st_point_y = randi([round(Y(y)) + 80, 482]);
+        end_point_x = randi([30, 354]);
+        end_point_y = randi([round(Y(y)) + 80, 482]);
+        [curve_x, curve_y] = bezier([st_point_x, end_point_x],[st_point_y, end_point_y]);
+        line = zeros(Nx, Ny);
+        for b = 1:length(curve_x)
+            line(round(curve_y(b)), round(curve_x(b))) = mag;
+        end
+        source.p0 = source.p0 + line;
+    end
     % sensor_data simulation and add noise
     %sensor.mask = zeros(Nx, Ny);
     %sensor.mask(1, 1:6:768 ) = 1;
