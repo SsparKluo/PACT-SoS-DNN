@@ -9,10 +9,10 @@ import os
 from tensorflow.keras.models import load_model
 
 # Basic configuration
-bs = 12
-model_name = 'SoS_prediction'
+bs = 8
+model_name = 'SoS_prediction_3'
 saved_model = './saved_model/{}'.format(model_name)
-best_checkpoint = './saved_model/{}_best_2'.format(model_name)
+best_checkpoint = './saved_model/{}_best'.format(model_name)
 figure_path = './figure/{} - Model loss.png'.format(model_name)
 
 if not os.path.exists(saved_model):
@@ -21,10 +21,11 @@ if not os.path.exists(best_checkpoint):
     os.mkdir(best_checkpoint)
 
 # import data
-trainset_loader = data_io.ImageDataGenerator(batch_size=bs, overlying=False)
-validset_loader = data_io.ImageDataGenerator(batch_size=bs, overlying=False, mode='valid')
+trainset_loader = data_io.SoSGenerator(batch_size=bs)
+validset_loader = data_io.SoSGenerator(batch_size=bs, mode='valid')
 
 # Training network
+'''
 encoder_model = load_model('./saved_model/unet_forFT')
 model = network.cnn_dense(img_shape=(256,192,1), batchnorm=True)
 
@@ -35,7 +36,10 @@ for idx, layer in enumerate(model.layers):
         continue
     layer.set_weights(encoder_model.layers[idx].get_weights())
     layer.trainable = False
-
+'''
+model = load_model('./saved_model/SoS_prediction_2')
+for layer in model.layers:
+    layer.trainable = True
 model.summary()
 
 model.compile(loss=MeanSquaredError(),

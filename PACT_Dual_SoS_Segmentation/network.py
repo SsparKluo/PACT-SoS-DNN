@@ -227,14 +227,11 @@ def cnn_dense(img_shape=(256, 192, 1),
              n]) if res else n
 
     def dense_link(m, acti, do, depth):
-        shape = (16 * 2**depth, 12 * 2**depth)
         n = Flatten()(m)
-        n = Dense(units=12 * 2**depth, kernel_initializer=initializers.HeNormal())(n)
+        n = Dense(units=32 * 4**depth, kernel_initializer=initializers.HeNormal())(n)
         n = BatchNormalization()(n)
         n = LeakyReLU()(n) if acti == 'relu' else activations.sigmoid(n)
         n = Dropout(do)(n) if do else n
-        n = Dense(units=shape[0] * shape[1],
-                  kernel_initializer=initializers.HeNormal())(n)
         return n
 
     input = Input(shape=img_shape)
@@ -246,11 +243,16 @@ def cnn_dense(img_shape=(256, 192, 1),
     n = MaxPooling2D()(n)
     m1 = conv_block(n, 8 * start_ch, activation, batchnorm, residual, dropout, padding)
     n = MaxPooling2D()(m1)
-    m2 = conv_block(n, 8 * start_ch, activation, batchnorm, residual, dropout, padding)
+    m2 = conv_block(n, 16 * start_ch, activation, batchnorm, residual, dropout, padding)
     dense2 = dense_link(m2, activation, dropout, 0)
     dense1 = dense_link(m1, activation, dropout, 1)
-    
     n = Concatenate()([dense2, dense1])
+    n = Dense(units=640, kernel_initializer=initializers.HeNormal())(n)
+    n = BatchNormalization()(n)
+    n = LeakyReLU()(n)
+    n = Dense(units=320, kernel_initializer=initializers.HeNormal())(n)
+    n = BatchNormalization()(n)
+    n = LeakyReLU()(n)
     n = Dense(units=1, activation='linear')(n)
     output = n
     return Model(inputs=input, outputs=output)
