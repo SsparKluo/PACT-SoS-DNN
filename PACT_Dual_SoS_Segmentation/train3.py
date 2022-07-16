@@ -10,7 +10,7 @@ from tensorflow.keras.models import load_model
 
 # Basic configuration
 bs = 48
-model_name = 'SoS_prediction_5'
+model_name = 'SoS_prediction_6'
 saved_model = './saved_model/{}'.format(model_name)
 best_checkpoint = './saved_model/{}_best'.format(model_name)
 figure_path = './figure/{} - Model loss.png'.format(model_name)
@@ -38,8 +38,8 @@ for idx, layer in enumerate(model.layers):
     layer.trainable = False
 '''
 model = load_model('./saved_model/SoS_prediction_4')
-#for layer in model.layers:
-#    layer.trainable = True
+for layer in model.layers:
+    layer.trainable = True
 
 model.summary()
 
