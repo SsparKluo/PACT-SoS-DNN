@@ -1,3 +1,5 @@
+# This file is not important.
+
 from matplotlib import pyplot as plt
 import network
 import tensorflow.keras.optimizers as optim
@@ -17,7 +19,7 @@ figure_path = './figure/{} - Model loss.png'.format(model_name)
 
 if not os.path.exists(saved_model):
     os.mkdir(saved_model)
-#if not os.path.exists(best_checkpoint):
+# if not os.path.exists(best_checkpoint):
 #    os.mkdir(best_checkpoint)
 
 # import data
@@ -28,8 +30,10 @@ validset_loader = data_io.ImageDataGenerator(batch_size=bs, overlying=False, mod
 
 decoder_model = load_model('./saved_model/unet_dense_2')
 encoder_model = load_model('./saved_model/unet_forFT')
-model = network.unet(img_shape=(256,192,1), batchnorm=True)
+model = network.unet(img_shape=(256, 192, 1), batchnorm=True)
 
+# load weights from encoder_model.
+# Only set weights of convolutional layer, and ignore weights of any upconv layer.
 for idx, layer in enumerate(model.layers):
     if 'up' in layer.name:
         break
@@ -38,6 +42,8 @@ for idx, layer in enumerate(model.layers):
     layer.set_weights(encoder_model.layers[idx].get_weights())
     layer.trainable = False
 
+# load weights from encoder_model.
+# Only set weights of conv layers in the last 6 layers.
 reverse_layers = model.layers[::-1]
 
 for idx, layer in enumerate(reverse_layers, start=1):

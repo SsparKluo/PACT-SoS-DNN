@@ -1,3 +1,6 @@
+# This one is for training a encoder or decoder model for further use. 
+# But it may not be better than a normal method.
+
 from matplotlib import pyplot as plt
 import network
 import tensorflow.keras.optimizers as optim

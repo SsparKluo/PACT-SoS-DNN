@@ -26,10 +26,14 @@ validset_loader = data_io.ImageDataGenerator(batch_size=bs, overlying=False, mod
 
 # Training network
 '''
+# This part is for loading weights from encoder_model and decoder_model to the current model
+# You can uncomment this part and comment the next part if you need it.
+
 decoder_model = load_model('./saved_model/unet_dense_2')
 encoder_model = load_model('./saved_model/unet_forFT')
 model = network.unet_with_dense(img_shape=(256,192,1), batchnorm=True)
 
+# Load weights from encoder_model, only for conv layers in the encoder part.
 for idx, layer in enumerate(model.layers):
     if 'up' in layer.name:
         break
@@ -38,6 +42,7 @@ for idx, layer in enumerate(model.layers):
     layer.set_weights(encoder_model.layers[idx].get_weights())
     layer.trainable = False
 
+# Load weights from decoder_model, only for conv layers in the last 6 layers.
 reverse_layers = model.layers[::-1]
 
 for idx, layer in enumerate(reverse_layers, start=1):
@@ -48,6 +53,8 @@ for idx, layer in enumerate(reverse_layers, start=1):
     layer.set_weights(encoder_model.layers[-idx].get_weights())
     layer.trainable = False
 '''
+
+# This part is for training a exist model.
 model = load_model('./saved_model/cnn_dense_FT3')
 for layer in model.layers:
     layer.trainable = True
