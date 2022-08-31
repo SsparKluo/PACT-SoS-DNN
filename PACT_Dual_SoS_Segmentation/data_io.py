@@ -7,7 +7,7 @@ import numpy as np
 import cv2
 import random
 
-
+# main data generator
 class ImageDataGenerator(Sequence):
     def __init__(
             self, path="../simulation_dual_SoS/", batch_size=8, shuffle=True,
@@ -42,22 +42,27 @@ class ImageDataGenerator(Sequence):
         targets = []
         for i in batch_paths:
             folderpath = self.paths[i // self.mag]
-            file_idx = i % self.mag // 2
             # 0 for 128 channels image; 1 for 64 channels image
+            file_idx = i % self.mag // 2
 
             img = cv2.imread("{}/input_128.png".format(folderpath), 0) \
                 if file_idx == 0 else \
                 cv2.imread("{}/input_64.png".format(folderpath), 0)
-
+            
+            # data augumentation
             img = cv2.flip(img, 1) if self.aug and i % 2 else img
+
             # 0 for raw image; 1 for flipping
             img = cv2.resize(img, self.output_size)
+
+            # Ground truth
             gt = loadmat("{}/GT.mat".format(folderpath))
             gt = gt['GT']
             gt = cv2.flip(gt, 1) if self.aug and i % 2 else gt
             gt = (gt - gt.min()) / (gt.max() - gt.min())
             gt = cv2.resize(gt, self.output_size)
             gt = np.array(gt)
+
             img = np.array(img) + 5 * gt if self.overlying else np.array(img)
             inputs.append(img)
             targets.append(gt)
@@ -68,7 +73,7 @@ class ImageDataGenerator(Sequence):
         if self.shuffle == True:
             random.shuffle(self.indexes)
 
-
+# Not in used 
 class ImageDataGenerator2(Sequence):
     def __init__(self, path="../simulation_dual_SoS/", batch_size=8, shuffle=True,
                  mode="train", data_augmentation="True", output_size=(192, 256),
@@ -89,7 +94,7 @@ class ImageDataGenerator2(Sequence):
         self.len = len(self.paths) * self.mag
         self.indexes = np.arange(self.len)
         self.output_size = output_size
-        self.overlying = overlying
+        self.overlying = overlying # just ignore this one lol.
         if self.shuffle:
             random.shuffle(self.indexes)
 
@@ -102,15 +107,17 @@ class ImageDataGenerator2(Sequence):
         targets = []
         for i in batch_paths:
             folderpath = self.paths[i // self.mag]
-            file_idx = i % self.mag // 2
             # 0 for 128 channels image; 1 for 64 channels image
-
+            file_idx = i % self.mag // 2
+            
             img = cv2.imread("{}/input_128.png".format(folderpath), 0) \
                 if file_idx == 0 else \
                 cv2.imread("{}/input_64.png".format(folderpath), 0)
 
-            img = cv2.flip(img, 1) if self.aug and i % 2 else img
             # 0 for raw image; 1 for flipping
+            img = cv2.flip(img, 1) if self.aug and i % 2 else img
+            
+            # Ground truth
             img = cv2.resize(img, self.output_size)
             gt = loadmat("{}/GT.mat".format(folderpath))
             gt = gt['GT']
@@ -132,7 +139,8 @@ class ImageDataGenerator2(Sequence):
         if self.shuffle == True:
             random.shuffle(self.indexes)
 
-
+# data generator for raw sensor data (without time reversal). 
+# This one is not used, and it can be used in a ConvLSTM model.
 class RawDataGenerator(Sequence):
     def __init__(
             self, path="../simulation_dual_SoS/", batch_size=8, shuffle=True, time=60,
@@ -196,7 +204,8 @@ class RawDataGenerator(Sequence):
             targets.append(np.array(gt_seq))
         return np.expand_dims(np.array(inputs), axis=-1), np.array(targets)
 
-
+# This one use a initial pressure map as ground truth. 
+# It is for reconstructing initial pressure map from reconstructed image (with distortion).
 class ImageDataGenerator3(Sequence):
     def __init__(
             self, path="../simulation_dual_SoS/", batch_size=8, shuffle=True,
@@ -251,7 +260,7 @@ class ImageDataGenerator3(Sequence):
         if self.shuffle == True:
             random.shuffle(self.indexes)
 
-
+# Data generator for SoS prediction
 class SoSGenerator(Sequence):
     def __init__(
             self, path="../simulation_dual_SoS/", batch_size=8, shuffle=True,
