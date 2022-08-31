@@ -15,5 +15,4 @@ To be completed
 |   |-- v.* #验证集
 |   |-- t.* #测试集
 |   `-- simulation.m #模拟程序
-
 ```
